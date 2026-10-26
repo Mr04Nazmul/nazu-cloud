@@ -53,3 +53,7 @@ Follow-up GitHub CI run [40414625767](https://github.com/Mr04Nazmul/nazu-cloud/a
 ## Free staging trial preparation
 
 Render is connected in the confirmed workspace; existing services and data were not changed. A manual-only bounded GitHub Actions worker trial and setup guide were added on this branch. Formatting, lint, typecheck and 70 local tests pass; the workflow has not run against staging and is not scheduled. Staging-only credentials, actual TLS, alert delivery and operational reliability remain unverified. Existing Render free database expires 2026-11-05; a protected backup and restore verification are outstanding. See docs/FREE_STAGING_WORKERS.md.
+
+## Hostless staging web preview
+
+The Hostless `nazu-cloud-staging` web app built commit `80d250b48b11d5614157aa06eb9c61d60970ba1a` and showed Running on 2026-10-27. The public homepage, its labeled demo outage toggle, documentation page, and `/v1/health` were checked in a browser. The health endpoint explicitly reports dependencies not checked. This is an unauthenticated development preview; no database, authentication, monitor worker, alert delivery, or production readiness is verified. The configuration review estimated $0.00; actual billing is provider-dependent. Existing Render data remains unmodified; its backup is outstanding. Staging URL: https://nazu-cloud-staging.hostless.app/.
