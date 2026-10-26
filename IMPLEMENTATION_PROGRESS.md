@@ -49,3 +49,7 @@ The retained user build contract is in docs/BUILD_CONTRACT.md, with launch gates
 The database client now verifies server certificate chains and hostnames; disable mode is restricted to explicitly marked development/test loopback connections. 70 local tests, lint, strict typecheck and production build passed. Actual provider TLS connectivity is not verified. Vercel and Railway integrations were identified but are not connected. Host account availability, eligibility, costs, runtime credentials, app deployment and persistent worker deployment remain unverified; no payment, purchase or deployment was initiated. See docs/STAGING_DEPLOYMENT.md.
 
 Follow-up GitHub CI run [40414625767](https://github.com/Mr04Nazmul/nazu-cloud/actions/runs/40414625767) passed all steps for source commit `cc948131458a96246e03042bc2d97c8167694072` (70 tests), including the database TLS hardening. The actual hosted database connection and web/worker deployment remain unverified.
+
+## Free staging trial preparation
+
+Render is connected in the confirmed workspace; existing services and data were not changed. A manual-only bounded GitHub Actions worker trial and setup guide were added on this branch. Formatting, lint, typecheck and 70 local tests pass; the workflow has not run against staging and is not scheduled. Staging-only credentials, actual TLS, alert delivery and operational reliability remain unverified. Existing Render free database expires 2026-11-05; a protected backup and restore verification are outstanding. See docs/FREE_STAGING_WORKERS.md.
