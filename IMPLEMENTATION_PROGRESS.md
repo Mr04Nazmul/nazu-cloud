@@ -69,3 +69,7 @@ On 2026-10-27 the dedicated NAZU Cloud Staging Supabase Auth site URL was change
 ## Auth and mail staging prerequisites
 
 Reviewed the deployed auth form and callback and current Supabase documentation. The built-in SMTP provider is restricted to project-team email addresses and has a small development-only rate limit; customer signup requires a configured custom SMTP provider or equivalent and verified delivery. The app's NEXT_PUBLIC Supabase values must be provided at build time, and backend database access must use separately managed server-only least-privilege credentials with verified TLS. Neither environment configuration nor real signup, callback, reset, or email delivery has been tested. No production migration, paid service, live billing, or old database change occurred.
+
+## Staging database security inspection
+
+Read-only inspection on 2026-10-27 confirmed all 20 `nazu_cloud` tables have RLS enabled, are owned by postgres, and have zero policies; none uses FORCE RLS. Browser roles have no schema access. This is a deny-by-default browser configuration, not tenant isolation for the privileged backend. A new non-owner login without matching policies would be denied; using the owner instead would bypass these protections. Do not connect real user workloads until separate runtime roles, tenant-aware policies, worker access, and cross-tenant integration tests have been implemented and reviewed. SMTP for public signup is also unconfigured. No database objects or credentials were changed.
