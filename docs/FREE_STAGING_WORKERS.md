@@ -1,0 +1,9 @@
+# Manual bounded staging worker trial
+
+The workflow `.github/workflows/staging-workers.yml` is an opt-in, manual-only trial. It is not scheduled, not deployed, and has not been tested against the hosted database, real RPC endpoints, or alert providers. GitHub scheduled jobs may be delayed or dropped; do not use this trial to promise monitoring intervals or alert SLAs. The existing long-running workers remain the production design.
+
+Before enabling the trial, establish dedicated least-privilege credentials **only for the isolated NAZU Cloud Staging project**, verify TLS connectivity and tenant isolation, review approved RPC hosts and test recipients, and configure the GitHub `staging` environment's protected secrets and variables. Never use the old NAZU database or production credentials. Use GitHub's secure settings, never paste secrets into chat or commit them.
+
+Required secrets: `STAGING_DATABASE_URL`, `STAGING_RPC_ENCRYPTION_KEY`, `STAGING_ALERT_ENCRYPTION_KEY`; `STAGING_DB_SSL_CA` when needed by the provider; `STAGING_RESEND_API_KEY` for email. Variables: `STAGING_RPC_ALLOWED_HOSTS`, `STAGING_ALERT_ALLOWED_EMAILS`, and `STAGING_ALERT_FROM_EMAIL`. A successful trial does not prove actual alerts were delivered: validate a controlled incident and recipient independently. The 90-second limit applies to each worker and failures yield a failed job. Observe GitHub Actions usage and applicable terms before scheduling anything. No secrets are configured by this change.
+
+Existing Render `nazu-db` expires on 2026-11-05: preserve its data separately. The Render connector supplies read-only queries but not a database export or credentials; use a secure Dashboard connection and `pg_dump` according to Render's backup documentation, then verify a restore in an isolated environment. Do not migrate or delete data without the separately required approval. See https://render.com/docs/postgresql-backups.
