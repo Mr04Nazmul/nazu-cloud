@@ -1,45 +1,43 @@
 # Implementation progress
 
-Updated 2026-10-27 JST. **Development implementation, not a completed production product.** Generated code is not deployment evidence.
+Updated 2026-10-27 JST. **Development implementation, not a completed production product.** Existing NAZU repositories and connected Supabase data remain unchanged.
 
-## Evidence
+## Current verification
 
-- New repository created: https://github.com/Mr04Nazmul/nazu-cloud
-- Existing repositories inspected read-only; audit at docs/DISCOVERY_AUDIT.md. No existing repository or Supabase data changed.
-- 53 local automated tests passed across 5 files: core/RBAC/SSRF/metrics, real SQL migration/constraints, API access boundary, EOA SIWE signature checks, encryption/delivery payload and SDK behavior.
-- Strict TypeScript check, ESLint and formatting passed on the tested revision.
-- Next.js production build passed. The build also passed after endpoint encryption.
-- Browser production preview: homepage loaded, outage toggle changed state and graph accessible name; desktop horizontal overflow check false. This is local QA, not public hosting. Mobile-device QA and authenticated browser E2E not completed.
-- Production dependency audit returned 0 known vulnerabilities at scan time. This does not prove absence of vulnerabilities.
-- GitHub CI run [40353768447](https://github.com/Mr04Nazmul/nazu-cloud/actions/runs/40353768447) passed all steps on source commit fd332e7a5ba0de0f8f4f871ee2ab336e29b3bf82 (53 tests). Earlier run 40353221559 also passed. Documentation-only evidence updates do not change the tested code.
+- 66 local automated tests pass across 7 files.
+- Formatting, ESLint, strict TypeScript and Next.js production build pass.
+- Handler integration tests execute actual API handlers and SQL in PGlite. Supabase developer identity is mocked; wallet signatures use ephemeral local EOA keys and actual viem verification.
+- Verified flows: key create/hash → monitor create/encrypted URL → quota rejection → key revocation; stored key expiry and scope rejection; cross-organization project/member denial; exact-name delete guard; parallel SIWE replay allows one session; session lookup/logout/revocation.
+- Other tests cover tenant foreign keys, browser-role denial, stale status, cooldown lookup, obsolete downtime cancellation, member/owner protection, admin/MFA policy, bounded requests and SSRF controls.
+- Previous source CI run [40353768447](https://github.com/Mr04Nazmul/nazu-cloud/actions/runs/40353768447) passed at the 53-test milestone. Follow-up commits require their own CI verification.
+- Prior production browser preview: homepage and outage toggle worked; signup was disabled without configuration; dashboard displayed setup state. Updated authenticated controls have not had configured browser E2E or mobile QA.
+- No live website, API, worker or billing success is claimed.
 
 ## Phase status
 
-| Phase                | Implemented / verified locally                                                                                                                            | Incomplete or blocked                                                                                                 |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| 0 Discovery          | Repositories, branch inventory, auth/contracts/schema/dependency review; connected projects/table summaries and shared-project security advisor inspected | Not an exhaustive historical-branch or contract deployment audit; chain deployment unverified                         |
-| 1 Foundation         | pnpm monorepo, Next.js, strict TS, shared packages, actual isolated migration verified in PGlite, CI source                                               | Dedicated staging DB selection/credentials; no hosted migration applied; DB role hardening                            |
-| 2 Website            | Public pages, docs, proposed pricing, auth forms, reduced-motion CSS, interactive labeled demo                                                            | Mobile-device and accessibility audit; legal drafts require operator details                                          |
-| 3 Developer platform | Organization/project creation, server membership/RBAC, key create/list/revoke/rotate/scope/expiry source, dashboard creation/revocation forms             | Real Supabase account/callback tests; project update/delete, team CRUD, complete metering and pagination              |
-| 4 Wallet auth        | SIWE, EOA signature tests, single-use SQL nonce test, project/origin sessions, wallet SDK source                                                          | HTTP parallel replay tests, EIP-1271 live tests, auth abuse protection, relying-party session exchange                |
-| 5 RPC monitoring     | Secure checker, leased worker, actual check/incident persistence source, metrics, real-data detail chart component and encrypted provider URL storage     | Deployed scheduled checks, live RPC integration, worker recovery/load tests, freshness diagnostics                    |
-| 6 Alerts             | AES-GCM destinations, constrained recipients/webhooks, atomic incident outbox, retry worker, create/list/delete/test source; mocked payload tests         | Operator verification/rule workflow, alert edit API, cooldown/latency alerts, live delivery and worker recovery tests |
-| 7 SDK/docs           | Local typed SDKs and guides, OpenAPI 3.1 contract, SDK error/write-retry tests                                                                            | Published package ownership/release, comprehensive contract tests, sandbox credentials                                |
-| 8 Payments           | Proposed plans, free monitor count and per-key per-minute cap                                                                                             | Payment provider eligibility, checkout, portal, verified/idempotent webhooks, paid entitlements: NOT IMPLEMENTED      |
-| 9 Security/testing   | Local tests, lint/typecheck/build, dependency audit                                                                                                       | Hosted tenant HTTP tests, load/failure recovery, full auth E2E, new-project advisors, external review                 |
-| 10 Deployment        | Node/worker deployment instructions and Dockerfiles                                                                                                       | No verified live website/API/docs URL, worker host, production domain, backups or external error tracking             |
-| 11 Beta              | Milestones documented                                                                                                                                     | No users contacted, no customers/revenue/integrations claimed                                                         |
+| Phase              | Implemented                                                                                                                                 | Still required                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Discovery          | Repository/default-source review, branch inventory, connected schema summaries and existing security-advisor review                         | Exhaustive historical review and on-chain token deployment proof                                                   |
+| Foundation         | Strict pnpm monorepo, Next.js, private-schema migration and additive indexes, CI                                                            | Dedicated staging credentials, least-privilege DB roles, hosted advisor review                                     |
+| Website            | Public pages, docs, auth forms, labeled demo, responsive styles                                                                             | Mobile/accessibility QA, legal operator details                                                                    |
+| Developer platform | Organization/project creation; project update/delete; member CRUD/policies; API key lifecycle; quota/metering source; management dashboards | Live Supabase auth tests, email invitations, paid entitlements, pagination                                         |
+| Wallet auth        | SIWE, atomic nonce/session transaction, real signed-handler replay test, revocation, project limiter                                        | Live EIP-1271, relying-party cookie exchange, distributed abuse tests                                              |
+| RPC monitoring     | Secure checker, leased worker, encrypted URLs, actual check/incident source, charts, stale status becomes unknown                           | Deployed provider checks, block freshness, failure/load tests                                                      |
+| Alerts             | Encrypted channels, channel edits/re-verification, rules/UI, delivery history, outbox, retries/cooldown, recovery cancellation              | Operator ownership procedure, latency alerts, real delivery/recovery tests                                         |
+| SDK/docs           | Local typed SDKs, OpenAPI, examples and SDK tests                                                                                           | Release packaging, ownership verification, sandbox, broad contract coverage                                        |
+| Billing            | Proposed plans; free quotas enforced                                                                                                        | Provider/business eligibility, checkout, portal, signed/idempotent webhooks and paid entitlements: not implemented |
+| Admin              | Server ID allowlist + admin metadata + MFA policy; read-only DB counts/audits/heartbeat views                                               | MFA enrollment/verification UI and real auth tests; audited admin mutation workflows                               |
+| Operations         | Separate worker instructions, Dockerfiles, encrypted secrets configuration                                                                  | Hosting, dedicated staging, verified domain, retention jobs, backups/restore, external error tracking              |
+| Beta               | Business milestones documented                                                                                                              | No outreach, integrations, customers or revenue claimed                                                            |
 
-## Remaining configuration
+## Exact next configuration decision
 
-A dedicated approved staging database and process-host setup are required. Do not repurpose shared testnet data. Set server DATABASE_URL; public Supabase URL/publishable key; APP_ORIGIN; trusted RPC host/chain maps; actual worker region; alert encryption/sender/approved recipients. Never paste secrets into chat or commit them. See OPERATIONS.md.
+The connected Supabase organization is **Nazu testnet** (`xwssbsavwunzmvxxvlwn`). Its existing shared project contains testnet and unrelated app data; it will not be repurposed. The other existing project is named for a different app and will not be repurposed silently. Select an organization for a new isolated NAZU Cloud staging project before project creation. Obtain a cost quote and explicit approval for any nonzero cost. No cost or purchase has been authorized.
 
-No purchases, production migration, token operations, npm publication, or live billing were performed.
+Then configure dedicated database/Auth, process hosting, server secret values, approved RPCs, actual worker region and controlled alert sender/recipients. Do not paste secrets into chat. No production migration may run without the user's approval.
 
 ## Known limitations
 
-The private schema denies direct browser-role access and relies on server membership checks with the backend database connection. It does not yet implement tenant-context policies for least-privilege backend DB roles. Monitoring coverage is an estimated interval denominator and does not reconstruct pauses/jitter. Provider URLs are encrypted at rest; encryption keys require managed storage and a rotation/re-encryption procedure. Alert delivery is at-least-once; duplicates are possible after a crash. Accepted authentication events are not final response outcomes. Several dashboard/admin sections explicitly show incomplete states. Proposed plan retention and monthly quotas are not enforced.
+RLS denies direct browser access; the backend still needs least-privilege tenant-context database hardening. Monitoring coverage estimates do not reconstruct pauses/jitter. Alert delivery is at-least-once and can duplicate after a crash. Updated UI controls are build-checked, not authenticated browser-tested. Unknown usage outcomes stay unknown; daily rollups and retention automation are pending. Global admin mutation controls and all paid billing remain disabled.
 
-## Configuration-free browser checks
-
-Production preview homepage and outage toggle verified. Signup clearly showed unconfigured account services and disabled account creation. An executor HTTP smoke script could not reach the isolated preview server reliably; it is not counted as passing HTTP or production smoke coverage.
+No token operations, existing-data migration, npm publication, purchases or customer communications were performed.

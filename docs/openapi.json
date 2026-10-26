@@ -3,7 +3,7 @@
   "info": {
     "title": "NAZU Cloud API",
     "version": "0.1.0",
-    "description": "Development contract. No verified production endpoint. DeveloperCookie represents Supabase SSR auth cookies; actual cookie names depend on the project. Wallet routes require an exact registered Origin header. Browser developer mutations require APP_ORIGIN. List pagination, billing and remaining blueprint routes are not implemented."
+    "description": "Development contract. No verified production endpoint. DeveloperCookie represents Supabase SSR auth cookies; actual cookie names depend on the project. Wallet routes require an exact registered Origin header. Browser developer mutations require APP_ORIGIN. List pagination, billing and remaining blueprint routes are not implemented. Project mutation/member management and alert rule/history routes added. Billing remains disabled. Wallet endpoints also enforce 120 requests/minute/project. Lists remain capped; cursor pagination is pending."
   },
   "servers": [
     {
@@ -187,6 +187,9 @@
           },
           "503": {
             "description": "Dependency unavailable or not configured"
+          },
+          "429": {
+            "description": "60 requests/minute/key or 10,000 authenticated requests/UTC month/organization exceeded"
           }
         },
         "parameters": [
@@ -226,6 +229,9 @@
           },
           "503": {
             "description": "Dependency unavailable or not configured"
+          },
+          "429": {
+            "description": "60 requests/minute/key or 10,000 authenticated requests/UTC month/organization exceeded"
           }
         },
         "requestBody": {
@@ -296,6 +302,9 @@
           },
           "503": {
             "description": "Dependency unavailable or not configured"
+          },
+          "429": {
+            "description": "60 requests/minute/key or 10,000 authenticated requests/UTC month/organization exceeded"
           }
         },
         "parameters": [
@@ -335,6 +344,9 @@
           },
           "503": {
             "description": "Dependency unavailable or not configured"
+          },
+          "429": {
+            "description": "60 requests/minute/key or 10,000 authenticated requests/UTC month/organization exceeded"
           }
         },
         "parameters": [
@@ -390,6 +402,9 @@
           },
           "503": {
             "description": "Dependency unavailable or not configured"
+          },
+          "429": {
+            "description": "60 requests/minute/key or 10,000 authenticated requests/UTC month/organization exceeded"
           }
         },
         "parameters": [
@@ -897,7 +912,7 @@
     },
     "/usage/summary": {
       "get": {
-        "summary": "Read summary (response-outcome instrumentation incomplete)",
+        "summary": "Read summary for API-key requests; pending/unknown outcomes are explicit",
         "responses": {
           "200": {
             "description": "Successful response"
@@ -938,7 +953,7 @@
     },
     "/usage/history": {
       "get": {
-        "summary": "Read history (response-outcome instrumentation incomplete)",
+        "summary": "Read history for API-key requests; pending/unknown outcomes are explicit",
         "responses": {
           "200": {
             "description": "Successful response"
@@ -979,7 +994,7 @@
     },
     "/usage/limits": {
       "get": {
-        "summary": "Read limits (response-outcome instrumentation incomplete)",
+        "summary": "Read limits for API-key requests; pending/unknown outcomes are explicit",
         "responses": {
           "200": {
             "description": "Successful response"
@@ -1175,6 +1190,606 @@
               "format": "uuid"
             }
           },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Replace encrypted destination and invalidate verification and pending deliveries",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "destination": {
+                    "type": "string"
+                  }
+                },
+                "required": ["organizationId", "destination"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "summary": "Read project metadata",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update project name and/or exact authorized origins",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "origins": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete project and dependent resources; exact name confirmation required",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "confirmName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["confirmName"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/current/members": {
+      "get": {
+        "summary": "List organization memberships",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "summary": "Add an existing registered user within free seat entitlement; no invitation email",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["admin", "developer", "readonly"]
+                  }
+                },
+                "required": ["organizationId", "userId", "role"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/current/members/{id}": {
+      "patch": {
+        "summary": "Change member role; owners, self and admin escalation protected",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["admin", "developer", "readonly"]
+                  }
+                },
+                "required": ["organizationId", "role"]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove member; owners and self protected",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": ["organizationId"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alert-rules": {
+      "get": {
+        "summary": "List assigned monitor channels",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create or update monitor/channel rule",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "monitorId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "channelId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "cooldownSeconds": {
+                    "type": "integer",
+                    "minimum": 300,
+                    "maximum": 86400,
+                    "default": 900
+                  }
+                },
+                "required": ["organizationId", "monitorId", "channelId"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alert-rules/{id}": {
+      "delete": {
+        "summary": "Remove rule",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/alert-deliveries": {
+      "get": {
+        "summary": "List actual delivery outcomes; never channel destinations",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Resource or entitlement conflict"
+          },
+          "429": {
+            "description": "Quota or rate limit exceeded"
+          },
+          "503": {
+            "description": "Dependency not configured or unavailable"
+          }
+        },
+        "parameters": [
           {
             "name": "organizationId",
             "in": "query",

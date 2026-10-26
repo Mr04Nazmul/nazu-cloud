@@ -1,9 +1,9 @@
 # Roadmap and business gates
 
 1. Complete HTTP integration tests against staging Auth/database and a deployed worker.
-2. Complete staging tests for monitoring charts and session refresh proxy, then team/member CRUD and audited admin operations.
-3. Complete alert rule UI, verification, latency thresholds, cooldown and delivery history.
-4. Implement accurate per-response API usage, monthly quotas, history retention and SDK release packaging.
+2. Complete staging tests for monitoring charts, session refresh, team/member operations and MFA-protected read-only admin views; add audited admin mutation workflows.
+3. Complete operator verification, latency thresholds and staging tests for alert rule UI, cooldown and delivery history.
+4. Staging-test per-response API usage/monthly quotas, then complete history retention and SDK release packaging.
 5. Add operational backups, error tracking, egress policy, load/failure recovery tests and independent security review.
 6. Verify payment account country/business eligibility; implement hosted checkout, signed/idempotent webhooks, portal and entitlements in test mode.
 7. Deploy and verify the complete system before accepting customers.

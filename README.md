@@ -34,7 +34,7 @@ The worker must run continuously on a container/process host. Vercel request fun
 
 - Public SaaS pages, labeled interactive demo, documentation, initial authenticated dashboard and setup states.
 - Supabase developer sign-in/signup/reset forms, code callback, server user validation and mutation origin checks.
-- Organizations/projects, role checks, API key one-time generation, hashing, scopes, revocation and atomic rotation.
+- Organizations/projects, role checks and member-management policies, project update/delete, API key one-time generation, hashing, scopes, revocation and atomic rotation.
 - SIWE messages, signature verification through viem, atomic nonce consumption, expiring hashed wallet sessions.
 - EVM monitor APIs and a scheduler using row leases and `FOR UPDATE SKIP LOCKED`.
 - Exact HTTPS provider allowlist, public DNS checks, pinned connections, redirect rejection, body limits and request deadlines.
@@ -44,7 +44,7 @@ The worker must run continuously on a container/process host. Vercel request fun
 
 ## Not ready for commercial launch
 
-Payments, team invitation management, complete admin controls, retention automation, per-outcome usage metering, monthly quotas, alert cooldowns, latency alerts and end-to-end configured deployment remain incomplete. Token deployment, minting, distribution and sales are out of scope.
+Payments, email team invitations, complete admin mutation controls, retention automation and latency alerts and end-to-end configured deployment remain incomplete. Token deployment, minting, distribution and sales are out of scope.
 
 ## API and documentation
 

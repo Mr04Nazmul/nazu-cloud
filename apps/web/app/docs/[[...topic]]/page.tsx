@@ -31,7 +31,7 @@ const guides: Record<string, { title: string; text: string; code?: string }> = {
   },
   alerts: {
     title: "Alert integrations",
-    text: "Encrypted channel storage, deduplicated incident outbox and a leased retry worker are implemented in source. Channels start unverified; an operator must verify ownership and configure alert rules. Cooldowns, latency alerts and live delivery tests remain release gates. Do not use production recipients yet.",
+    text: "Encrypted channel storage, deduplicated incident outbox and a leased retry worker are implemented in source. Channels start unverified; an operator must verify ownership and configure alert rules. Downtime cooldowns and delivery history are implemented; latency alerts and live delivery tests remain release gates. Do not use production recipients yet.",
   },
   errors: {
     title: "Errors, limits and troubleshooting",

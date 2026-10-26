@@ -14,3 +14,7 @@ Verified source commit: `fd332e7a5ba0de0f8f4f871ee2ab336e29b3bf82`.
 - An executor HTTP smoke attempt could not reliably connect to the isolated preview server. It is not passing evidence.
 
 A green build is not an authorization to launch. See SECURITY.md and OPERATIONS.md for remaining gates.
+
+## Follow-up source verification
+
+66 tests pass locally across 7 files, with formatting/lint/typecheck/production build passing. The new handler suite runs actual key, monitor, project/member and wallet route handlers against PGlite. It verifies key expiry/revocation/scopes, actual response outcome metering, quota rejection, cross-organization denial and parallel replay/session revocation. Developer Supabase identity remains mocked. Cooldown lookup runs against persisted SQL fixtures. MFA policy is unit-tested; configured Supabase MFA is not tested. Remote follow-up CI status is recorded in IMPLEMENTATION_PROGRESS.md once verified.

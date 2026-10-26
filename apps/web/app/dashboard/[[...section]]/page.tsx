@@ -1,3 +1,8 @@
+import {
+  TeamPanel,
+  AlertsPanel,
+  UsagePanel,
+} from "../../../components/management";
 import { MonitorDetail } from "../../../components/monitor-detail";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -62,7 +67,7 @@ export default async function Dashboard({
     { id: string; name: string; organization_id: string }[]
   >`select p.id,p.name,p.organization_id from nazu_cloud.projects p join nazu_cloud.organization_members m on m.organization_id=p.organization_id where m.user_id=${uid} order by p.created_at desc limit 100`;
   const monitors =
-    await sql`select r.id,r.name,r.chain_id,r.status,r.last_checked_at from nazu_cloud.rpc_monitors r join nazu_cloud.organization_members m on m.organization_id=r.organization_id where m.user_id=${uid} order by r.created_at desc limit 100`;
+    await sql`select r.id,r.name,r.organization_id,r.chain_id,case when r.paused then 'paused' when r.last_checked_at is null or r.last_checked_at<now()-make_interval(secs=>r.interval_seconds*2) then 'unknown' else r.status end as status,r.last_checked_at from nazu_cloud.rpc_monitors r join nazu_cloud.organization_members m on m.organization_id=r.organization_id where m.user_id=${uid} order by r.created_at desc limit 100`;
   const title =
     sections.find((s) => s.toLowerCase().replaceAll(" ", "-") === slug) ??
     (slug ? "Resource" : "Overview");
@@ -252,14 +257,19 @@ export default async function Dashboard({
               </div>
             );
           })())}
-        {[
-          "alerts",
-          "api-usage",
-          "wallet-auth",
-          "team",
-          "billing",
-          "settings",
-        ].includes(slug) && (
+        {slug === "team" && <TeamPanel organizations={orgs} />}
+        {slug === "alerts" && (
+          <AlertsPanel
+            organizations={orgs}
+            monitors={monitors.map((m) => ({
+              id: String(m.id),
+              name: String(m.name),
+              organization_id: String(m.organization_id),
+            }))}
+          />
+        )}
+        {slug === "api-usage" && <UsagePanel projects={projects} />}
+        {["wallet-auth", "billing", "settings"].includes(slug) && (
           <div className="empty">
             <h2>{title} is in development.</h2>
             <p>
