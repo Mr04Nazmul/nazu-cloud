@@ -1,0 +1,128 @@
+[
+  {
+    "name": "@radix-ui/react-slot",
+    "version": "1.5.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/slot"
+    }
+  },
+  {
+    "name": "@supabase/ssr",
+    "version": "0.12.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/supabase/ssr.git"
+    }
+  },
+  {
+    "name": "@supabase/supabase-js",
+    "version": "2.118.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/supabase/supabase-js.git",
+      "directory": "packages/core/supabase-js"
+    }
+  },
+  {
+    "name": "class-variance-authority",
+    "version": "0.7.1",
+    "license": "Apache-2.0",
+    "source": "https://github.com/joe-bell/cva.git"
+  },
+  {
+    "name": "clsx",
+    "version": "2.1.1",
+    "license": "MIT",
+    "source": "lukeed/clsx"
+  },
+  {
+    "name": "ipaddr.js",
+    "version": "2.5.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/whitequark/ipaddr.js.git"
+    }
+  },
+  {
+    "name": "lucide-react",
+    "version": "1.61.0",
+    "license": "ISC",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/lucide-icons/lucide.git",
+      "directory": "packages/lucide-react"
+    }
+  },
+  {
+    "name": "motion",
+    "version": "14.6.0",
+    "license": "MIT",
+    "source": "https://github.com/motiondivision/motion"
+  },
+  {
+    "name": "next",
+    "version": "16.4.3",
+    "license": "MIT",
+    "source": "vercel/next.js"
+  },
+  {
+    "name": "postgres",
+    "version": "3.4.9",
+    "license": "Unlicense",
+    "source": "porsager/postgres"
+  },
+  {
+    "name": "react",
+    "version": "19.3.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/react/react.git",
+      "directory": "packages/react"
+    }
+  },
+  {
+    "name": "react-dom",
+    "version": "19.3.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/react/react.git",
+      "directory": "packages/react-dom"
+    }
+  },
+  {
+    "name": "tailwind-merge",
+    "version": "3.7.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcastil/tailwind-merge.git",
+      "directory": "packages/tailwind-merge"
+    }
+  },
+  {
+    "name": "viem",
+    "version": "2.57.11",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/wevm/viem.git"
+    }
+  },
+  {
+    "name": "zod",
+    "version": "4.6.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/colinhacks/zod.git"
+    }
+  }
+]

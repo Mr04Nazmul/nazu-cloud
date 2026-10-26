@@ -3,16 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.32.1",
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "dev": "pnpm --filter @nazu-cloud/web dev",
+    "dev": "node scripts/dev.mjs",
     "build": "pnpm --filter @nazu-cloud/web build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm --filter @nazu-cloud/web exec next typegen && tsc --noEmit",
     "test": "vitest run",
     "worker": "tsx services/monitor-worker/src/main.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "alert-worker": "tsx services/alert-worker/src/main.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "1.5.0",
@@ -42,7 +43,7 @@
     "prettier": "3.9.10",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.15",
-    "typescript": "7.0.2",
+    "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
     "vitest": "5.0.5"
   }

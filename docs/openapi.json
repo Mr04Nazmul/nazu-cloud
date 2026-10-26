@@ -1,0 +1,1211 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NAZU Cloud API",
+    "version": "0.1.0",
+    "description": "Development contract. No verified production endpoint. DeveloperCookie represents Supabase SSR auth cookies; actual cookie names depend on the project. Wallet routes require an exact registered Origin header. Browser developer mutations require APP_ORIGIN. List pagination, billing and remaining blueprint routes are not implemented."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/v1",
+      "description": "Local development only"
+    }
+  ],
+  "security": [
+    {
+      "DeveloperCookie": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Web process liveness only; dependencies are not checked",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "security": []
+      }
+    },
+    "/organizations/current": {
+      "get": {
+        "summary": "List developer organizations",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create organization",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 80
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "summary": "List developer projects (100 record cap)",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create project",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "origins": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "required": ["organizationId", "name"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitors": {
+      "get": {
+        "summary": "List monitors (100 record cap)",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create approved EVM monitor",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "endpoint": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "intervalSeconds": {
+                    "type": "integer",
+                    "minimum": 300,
+                    "maximum": 86400,
+                    "default": 300
+                  },
+                  "latencyThresholdMs": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 30000,
+                    "default": 2000
+                  }
+                },
+                "required": ["projectId", "name", "endpoint", "chainId"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/monitors/{id}": {
+      "get": {
+        "summary": "Read monitor metadata",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Pause/resume monitor",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paused": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["paused"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete monitor",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/monitors/{id}/checks": {
+      "get": {
+        "summary": "Read monitor checks",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/monitors/{id}/metrics": {
+      "get": {
+        "summary": "Read monitor metrics",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/monitors/{id}/incidents": {
+      "get": {
+        "summary": "Read monitor incidents",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/api-keys": {
+      "get": {
+        "summary": "List key metadata; never raw secrets",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create API key; one-time secret response",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["monitors:read", "monitors:write"]
+                    }
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": ["projectId"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api-keys/{id}/rotate": {
+      "post": {
+        "summary": "Revoke old key and create replacement atomically",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["monitors:read", "monitors:write"]
+                    }
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": ["projectId"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api-keys/{id}": {
+      "delete": {
+        "summary": "Revoke key",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/auth/challenge": {
+      "post": {
+        "summary": "Create project-origin SIWE challenge",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "chainId": {
+                    "type": "integer"
+                  }
+                },
+                "required": ["projectId", "address", "chainId"]
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "summary": "Verify SIWE and consume challenge once",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "challengeId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": ["projectId", "challengeId", "signature"]
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/session": {
+      "get": {
+        "summary": "Read wallet session scoped to project and origin",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "WalletToken": []
+          }
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Revoke wallet session",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": ["projectId"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "WalletToken": []
+          }
+        ]
+      }
+    },
+    "/usage/summary": {
+      "get": {
+        "summary": "Read summary (response-outcome instrumentation incomplete)",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/usage/history": {
+      "get": {
+        "summary": "Read history (response-outcome instrumentation incomplete)",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/usage/limits": {
+      "get": {
+        "summary": "Read limits (response-outcome instrumentation incomplete)",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "DeveloperCookie": []
+          }
+        ]
+      }
+    },
+    "/alert-channels": {
+      "get": {
+        "summary": "List channel metadata",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create encrypted channel; starts unverified",
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": ["email", "discord"]
+                  },
+                  "destination": {
+                    "type": "string"
+                  }
+                },
+                "required": ["organizationId", "kind", "destination"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alert-channels/{id}/test": {
+      "post": {
+        "summary": "Queue test for operator-verified channel",
+        "responses": {
+          "202": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": ["organizationId"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alert-channels/{id}": {
+      "delete": {
+        "summary": "Delete channel",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "503": {
+            "description": "Dependency unavailable or not configured"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Server-side nazu_live_ key"
+      },
+      "WalletToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "One-hour wallet session token"
+      },
+      "DeveloperCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sb-PROJECT_REF-auth-token",
+        "description": "Supabase SSR session cookie; replace PROJECT_REF with actual configured project"
+      }
+    }
+  }
+}
