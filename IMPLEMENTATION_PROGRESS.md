@@ -8,10 +8,10 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 - Existing repositories inspected read-only; audit at docs/DISCOVERY_AUDIT.md. No existing repository or Supabase data changed.
 - 53 local automated tests passed across 5 files: core/RBAC/SSRF/metrics, real SQL migration/constraints, API access boundary, EOA SIWE signature checks, encryption/delivery payload and SDK behavior.
 - Strict TypeScript check, ESLint and formatting passed on the tested revision.
-- Next.js production build passed. The final build will be verified again after endpoint encryption.
+- Next.js production build passed. The build also passed after endpoint encryption.
 - Browser production preview: homepage loaded, outage toggle changed state and graph accessible name; desktop horizontal overflow check false. This is local QA, not public hosting. Mobile-device QA and authenticated browser E2E not completed.
 - Production dependency audit returned 0 known vulnerabilities at scan time. This does not prove absence of vulnerabilities.
-- GitHub CI run 40353221559 passed all steps on commit 027e09d8799786e22578a0337fff6488897757ff (52 tests). The subsequent endpoint-encryption change adds one test and requires its own CI run.
+- GitHub CI run [40353768447](https://github.com/Mr04Nazmul/nazu-cloud/actions/runs/40353768447) passed all steps on source commit fd332e7a5ba0de0f8f4f871ee2ab336e29b3bf82 (53 tests). Earlier run 40353221559 also passed. Documentation-only evidence updates do not change the tested code.
 
 ## Phase status
 
