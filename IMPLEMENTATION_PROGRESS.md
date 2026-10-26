@@ -65,3 +65,7 @@ On 2026-10-27, the dedicated Supabase staging project was rechecked as ACTIVE_HE
 ## Staging authentication redirect configuration
 
 On 2026-10-27 the dedicated NAZU Cloud Staging Supabase Auth site URL was changed from localhost to `https://nazu-cloud-staging.hostless.app` and the exact `/auth/callback` redirect was added and verified in the dashboard. No other project was changed. The web app still lacks the runtime environment and safe database credentials; registration, login and email flows remain disabled/unverified. Render's dashboard confirms built-in export on the existing free database requires a paid plan; a complete free manual export and restore validation remain outstanding.
+
+## Auth and mail staging prerequisites
+
+Reviewed the deployed auth form and callback and current Supabase documentation. The built-in SMTP provider is restricted to project-team email addresses and has a small development-only rate limit; customer signup requires a configured custom SMTP provider or equivalent and verified delivery. The app's NEXT_PUBLIC Supabase values must be provided at build time, and backend database access must use separately managed server-only least-privilege credentials with verified TLS. Neither environment configuration nor real signup, callback, reset, or email delivery has been tested. No production migration, paid service, live billing, or old database change occurred.
