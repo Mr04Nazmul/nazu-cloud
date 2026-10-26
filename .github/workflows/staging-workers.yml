@@ -1,0 +1,55 @@
+name: Manual staging worker trial
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nazu-staging-workers
+  cancel-in-progress: false
+jobs:
+  trial:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment: staging
+    env:
+      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      DB_SSL: verify-full
+      DB_SSL_CA: ${{ secrets.STAGING_DB_SSL_CA }}
+      RPC_ENCRYPTION_KEY: ${{ secrets.STAGING_RPC_ENCRYPTION_KEY }}
+      RPC_ALLOWED_HOSTS: ${{ vars.STAGING_RPC_ALLOWED_HOSTS }}
+      MONITOR_REGION: github-actions-staging
+      ALERT_ENCRYPTION_KEY: ${{ secrets.STAGING_ALERT_ENCRYPTION_KEY }}
+      ALERT_ALLOWED_EMAILS: ${{ vars.STAGING_ALERT_ALLOWED_EMAILS }}
+      RESEND_API_KEY: ${{ secrets.STAGING_RESEND_API_KEY }}
+      ALERT_FROM_EMAIL: ${{ vars.STAGING_ALERT_FROM_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: corepack enable && corepack prepare pnpm@11.25.0 --activate
+      - run: pnpm install --frozen-lockfile
+      - name: Check staging configuration
+        shell: bash
+        run: |
+          if [[ -z "$DATABASE_URL" || -z "$RPC_ENCRYPTION_KEY" || -z "$ALERT_ENCRYPTION_KEY" || -z "$RPC_ALLOWED_HOSTS" ]]; then
+            echo 'Required staging settings are missing; worker trial was not started.'
+            exit 1
+          fi
+      - name: Run bounded worker trial
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --preserve-status --signal=TERM --kill-after=15s 90s ./node_modules/.bin/tsx services/monitor-worker/src/main.ts &
+          monitor_pid=$!
+          timeout --preserve-status --signal=TERM --kill-after=15s 90s ./node_modules/.bin/tsx services/alert-worker/src/main.ts &
+          alert_pid=$!
+          monitor_status=0
+          alert_status=0
+          wait "$monitor_pid" || monitor_status=$?
+          wait "$alert_pid" || alert_status=$?
+          if [[ "$monitor_status" -ne 0 || "$alert_status" -ne 0 ]]; then
+            echo "Worker trial failed (monitor: $monitor_status; alerts: $alert_status)."
+            exit 1
+          fi
