@@ -61,3 +61,7 @@ The Hostless `nazu-cloud-staging` web app built commit `80d250b48b11d5614157aa06
 ## Staging readiness follow-up
 
 On 2026-10-27, the dedicated Supabase staging project was rechecked as ACTIVE_HEALTHY and the deployed `/signup` page was verified to disable account creation while Supabase configuration is missing. Authentication redirects and least-privilege database runtime credentials are not configured; no end-to-end signup, monitoring, or alert is claimed. Render database `nazu-db` remains available and expires 2026-11-05; a complete private export and restore test remain outstanding. The connected Render API provides read-only SQL but no database export or connection credentials; do not copy password hashes into the public repository.
+
+## Staging authentication redirect configuration
+
+On 2026-10-27 the dedicated NAZU Cloud Staging Supabase Auth site URL was changed from localhost to `https://nazu-cloud-staging.hostless.app` and the exact `/auth/callback` redirect was added and verified in the dashboard. No other project was changed. The web app still lacks the runtime environment and safe database credentials; registration, login and email flows remain disabled/unverified. Render's dashboard confirms built-in export on the existing free database requires a paid plan; a complete free manual export and restore validation remain outstanding.
