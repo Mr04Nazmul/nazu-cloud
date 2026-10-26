@@ -1,0 +1,49 @@
+{
+  "name": "nazu-cloud",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev": "pnpm --filter @nazu-cloud/web dev",
+    "build": "pnpm --filter @nazu-cloud/web build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "worker": "tsx services/monitor-worker/src/main.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "1.5.0",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.118.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "ipaddr.js": "2.5.0",
+    "lucide-react": "1.61.0",
+    "motion": "14.6.0",
+    "next": "16.4.3",
+    "postgres": "3.4.9",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwind-merge": "3.7.0",
+    "viem": "2.57.11",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.13.0",
+    "prettier": "3.9.10",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
+  }
+}
