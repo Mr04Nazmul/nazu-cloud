@@ -4,7 +4,7 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 
 ## Current verification
 
-- 66 local automated tests pass across 7 files.
+- 70 local automated tests pass across 8 files, including 4 database TLS configuration tests.
 - Formatting, ESLint, strict TypeScript and Next.js production build pass.
 - Handler integration tests execute actual API handlers and SQL in PGlite. Supabase developer identity is mocked; wallet signatures use ephemeral local EOA keys and actual viem verification.
 - Verified flows: key create/hash → monitor create/encrypted URL → quota rejection → key revocation; stored key expiry and scope rejection; cross-organization project/member denial; exact-name delete guard; parallel SIWE replay allows one session; session lookup/logout/revocation.
@@ -18,7 +18,7 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 | Phase              | Implemented                                                                                                                                 | Still required                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Discovery          | Repository/default-source review, branch inventory, connected schema summaries and existing security-advisor review                         | Exhaustive historical review and on-chain token deployment proof                                                   |
-| Foundation         | Strict pnpm monorepo, Next.js, private-schema migration and additive indexes, CI                                                            | Runtime staging credentials, least-privilege DB roles, real Auth tests                                     |
+| Foundation         | Strict pnpm monorepo, Next.js, private-schema migration and additive indexes, CI                                                            | Runtime staging credentials, least-privilege DB roles, real Auth tests                                             |
 | Website            | Public pages, docs, auth forms, labeled demo, responsive styles                                                                             | Mobile/accessibility QA, legal operator details                                                                    |
 | Developer platform | Organization/project creation; project update/delete; member CRUD/policies; API key lifecycle; quota/metering source; management dashboards | Live Supabase auth tests, email invitations, paid entitlements, pagination                                         |
 | Wallet auth        | SIWE, atomic nonce/session transaction, real signed-handler replay test, revocation, project limiter                                        | Live EIP-1271, relying-party cookie exchange, distributed abuse tests                                              |
@@ -27,7 +27,7 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 | SDK/docs           | Local typed SDKs, OpenAPI, examples and SDK tests                                                                                           | Release packaging, ownership verification, sandbox, broad contract coverage                                        |
 | Billing            | Proposed plans; free quotas enforced                                                                                                        | Provider/business eligibility, checkout, portal, signed/idempotent webhooks and paid entitlements: not implemented |
 | Admin              | Server ID allowlist + admin metadata + MFA policy; read-only DB counts/audits/heartbeat views                                               | MFA enrollment/verification UI and real auth tests; audited admin mutation workflows                               |
-| Operations         | Separate worker instructions, Dockerfiles, encrypted secrets configuration                                                                  | Hosting, staging runtime configuration, verified domain, retention jobs, backups/restore, error tracking              |
+| Operations         | Separate worker instructions, Dockerfiles, encrypted secrets configuration                                                                  | Hosting, staging runtime configuration, verified domain, retention jobs, backups/restore, error tracking           |
 | Beta               | Business milestones documented                                                                                                              | No outreach, integrations, customers or revenue claimed                                                            |
 
 ## Staging configuration
@@ -43,3 +43,7 @@ RLS denies direct browser access; the backend still needs least-privilege tenant
 No token operations, existing-data migration, npm publication, purchases or customer communications were performed.
 
 The retained user build contract is in docs/BUILD_CONTRACT.md, with launch gates in docs/LAUNCH_GATES.md.
+
+## Hosting preparation and TLS hardening
+
+The database client now verifies server certificate chains and hostnames; disable mode is restricted to explicitly marked development/test loopback connections. 70 local tests, lint, strict typecheck and production build passed. Actual provider TLS connectivity is not verified. Vercel and Railway integrations were identified but are not connected. Host account availability, eligibility, costs, runtime credentials, app deployment and persistent worker deployment remain unverified; no payment, purchase or deployment was initiated. See docs/STAGING_DEPLOYMENT.md.

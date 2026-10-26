@@ -22,3 +22,7 @@ These are not equivalent to a configured Supabase authentication or production p
 10. Verify payment eligibility, signed webhook idempotency and entitlements before enabling checkout.
 
 No private keys, seed phrases or service-role credentials are committed. No token operations are implemented.
+
+## Database TLS
+
+Database connections verify the certificate chain and hostname. For providers using a private CA, configure the trusted PEM via the server-only DB_SSL_CA secret. Disabling TLS is restricted to loopback development and forbidden in production. Real hosted connectivity and CA configuration remain unverified until staging credentials and hosting are connected.

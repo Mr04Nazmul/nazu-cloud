@@ -8,7 +8,7 @@ No production deployment, production domain, production database migration or pa
 
 1. Choose an authorized, dedicated development Supabase project. The existing shared testnet/catalog project must remain unchanged. The empty connected project is named for a different app and has not been repurposed.
 2. Back up/review the target; review and apply `supabase/migrations/*_cloud_initial.sql` to the dedicated target. No migration to existing NAZU user tables is needed.
-3. Provision separate least-privilege web and worker database logins, require TLS, and inject DATABASE_URL through the hosting secret manager.
+3. Provision separate least-privilege web and worker database logins, enforce certificate/hostname verification, and inject DATABASE_URL through the hosting secret manager. Set DB_SSL_CA to a trusted provider CA PEM only when required; use the Connect dialog for the actual pooler host. Verify connectivity before onboarding users.
 4. Set Supabase publishable URL/key, auth site URL, exact callback/reset URLs, email delivery and password policies. Store web development env at `apps/web/.env.local` or use process environment.
 5. Set a separate 32-byte base64 RPC_ENCRYPTION_KEY on the web and monitoring worker. Set APP_ORIGIN to the exact web HTTPS origin. Configure RPC_ALLOWED_HOSTS and trusted WALLET_CHAIN_RPC_JSON on the server. Keep all endpoint credentials private.
 6. Deploy Next.js on a Node-compatible host: repository root, install `pnpm install --frozen-lockfile`, build `pnpm build`, start `pnpm --filter @nazu-cloud/web start`. A Vercel monorepo project can instead target apps/web, with root workspace access enabled. Validate host configuration before deployment.

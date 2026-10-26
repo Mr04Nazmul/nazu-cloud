@@ -1,4 +1,5 @@
 import postgres from "postgres";
+import { databaseTlsOptions } from "./tls";
 let pool: ReturnType<typeof postgres> | undefined;
 export function db() {
   if (!process.env.DATABASE_URL)
@@ -8,6 +9,11 @@ export function db() {
     prepare: false,
     connect_timeout: 10,
     idle_timeout: 20,
-    ssl: process.env.DB_SSL === "disable" ? false : "require",
+    ssl: databaseTlsOptions({
+      url: process.env.DATABASE_URL,
+      mode: process.env.DB_SSL,
+      ca: process.env.DB_SSL_CA,
+      nodeEnv: process.env.NODE_ENV,
+    }),
   }));
 }
