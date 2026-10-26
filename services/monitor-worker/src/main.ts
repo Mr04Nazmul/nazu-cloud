@@ -1,3 +1,4 @@
+import { decryptEndpoint } from "../../../packages/shared/src/endpoint-secret";
 import { randomUUID } from "node:crypto";
 import { db } from "../../../packages/database/src/index";
 import { checkRpc } from "./rpc";
@@ -21,7 +22,7 @@ async function runOne() {
   });
   if (!claimed) return false;
   const result = await checkRpc(
-    claimed.endpoint,
+    decryptEndpoint(claimed.endpoint_ciphertext),
     claimed.chain_id,
     claimed.latency_threshold_ms,
     (process.env.RPC_ALLOWED_HOSTS ?? "").split(",").filter(Boolean),

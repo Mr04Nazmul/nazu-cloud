@@ -24,7 +24,7 @@ beforeAll(async () => {
     [project, orgA],
   );
   await db.query(
-    "insert into nazu_cloud.rpc_monitors(id,organization_id,project_id,name,endpoint,chain_id) values($1,$2,$3,'RPC','https://rpc.example',1)",
+    "insert into nazu_cloud.rpc_monitors(id,organization_id,project_id,name,endpoint_ciphertext,chain_id) values($1,$2,$3,'RPC','encrypted-staging-fixture-not-a-url',1)",
     [monitor, orgA, project],
   );
 });
@@ -50,7 +50,7 @@ describe("migration and tenant constraints", () => {
   it("rejects a monitor assigned to another organization project", async () => {
     await expect(
       db.query(
-        "insert into nazu_cloud.rpc_monitors(organization_id,project_id,name,endpoint,chain_id) values ($1,$2,'cross tenant','https://rpc.example',1)",
+        "insert into nazu_cloud.rpc_monitors(organization_id,project_id,name,endpoint_ciphertext,chain_id) values ($1,$2,'cross tenant','encrypted-staging-fixture-not-a-url',1)",
         [orgB, project],
       ),
     ).rejects.toThrow(/foreign key/);

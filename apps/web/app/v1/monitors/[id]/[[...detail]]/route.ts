@@ -54,7 +54,7 @@ export async function GET(req: Request, ctx: Context) {
     }
     if (part) throw new ApiError(404, "NOT_FOUND", "Unknown resource");
     const {
-      endpoint: _endpoint,
+      endpoint_ciphertext: _endpoint,
       lease_owner: _leaseOwner,
       lease_until: _leaseUntil,
       ...safe

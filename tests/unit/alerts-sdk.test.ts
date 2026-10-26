@@ -92,3 +92,14 @@ it("SDK preserves typed API response and server auth header", async () => {
     "Bearer server-secret",
   );
 });
+
+it("encrypts provider URL credentials at rest and rejects tampering", async () => {
+  vi.stubEnv("RPC_ENCRYPTION_KEY", Buffer.alloc(32, 9).toString("base64"));
+  const { encryptEndpoint, decryptEndpoint } =
+    await import("../../packages/shared/src/endpoint-secret");
+  const url = "https://rpc.example/SECRET_PROVIDER_KEY";
+  const sealed = encryptEndpoint(url);
+  expect(sealed).not.toContain("SECRET_PROVIDER_KEY");
+  expect(decryptEndpoint(sealed)).toBe(url);
+  expect(() => decryptEndpoint("broken")).toThrow();
+});

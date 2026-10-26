@@ -12,9 +12,10 @@ export default function Page() {
         </p>
         <h2>Delivery is not enabled</h2>
         <p>
-          The schema reserves encrypted channel destinations, alert rules and
-          deduplicated deliveries. The alert worker, retries, cooldowns and
-          delivery tests remain incomplete. No notification delivery is claimed.
+          The implementation includes encrypted channel destinations, alert
+          rules and deduplicated deliveries. The alert worker, retries,
+          cooldowns and delivery tests remain incomplete. No notification
+          delivery is claimed.
         </p>
         <div className="notice">
           Development status is explicit. See the repository progress document

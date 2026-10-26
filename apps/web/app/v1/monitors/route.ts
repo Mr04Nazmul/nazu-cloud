@@ -1,3 +1,4 @@
+import { encryptEndpoint } from "../../../../../packages/shared/src/endpoint-secret";
 import { z } from "zod";
 import { db } from "../../../../../packages/database/src/index";
 import {
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
           "Free plan supports one monitor; paid entitlements are not enabled",
         );
       const [m] =
-        await tx`insert into nazu_cloud.rpc_monitors(organization_id,project_id,name,endpoint,chain_id,interval_seconds,latency_threshold_ms) values (${p.organization_id},${p.id},${input.name},${input.endpoint},${input.chainId},${input.intervalSeconds},${input.latencyThresholdMs}) returning id,name,chain_id,status`;
+        await tx`insert into nazu_cloud.rpc_monitors(organization_id,project_id,name,endpoint_ciphertext,chain_id,interval_seconds,latency_threshold_ms) values (${p.organization_id},${p.id},${input.name},${encryptEndpoint(input.endpoint)},${input.chainId},${input.intervalSeconds},${input.latencyThresholdMs}) returning id,name,chain_id,status`;
       return m;
     });
     return Response.json({ data }, { status: 201 });

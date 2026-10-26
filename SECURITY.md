@@ -13,7 +13,7 @@ These are not equivalent to a configured Supabase authentication or production p
 1. Deploy to a dedicated staging database and apply the reviewed migration. Do not touch testnet tables.
 2. Split least-privilege database roles; test every route with two real organizations and all role combinations.
 3. Configure Supabase callback allowlists, SMTP, password policy, leaked-password protection and admin MFA. Review advisors on the new project.
-4. Encrypt RPC endpoint secrets and restrict worker network egress independently of application validation.
+4. Test RPC endpoint encryption-key rotation and restrict worker network egress independently of application validation.
 5. Test parallel SIWE replays through the HTTP endpoint, EIP-1271 contract wallets and relying-party cookie/CSRF behavior.
 6. Rate-limit verification/session endpoints; challenge issuance already has a per-project cap, but comprehensive auth abuse protection remains a gap.
 7. Replace CSP unsafe-inline with request nonces where deployment runtime supports them. unsafe-eval is development-only.

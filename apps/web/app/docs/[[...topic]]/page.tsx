@@ -31,7 +31,7 @@ const guides: Record<string, { title: string; text: string; code?: string }> = {
   },
   alerts: {
     title: "Alert integrations",
-    text: "Not implemented. Do not configure production webhook secrets yet. Email/Discord encrypted destination storage, notification outbox, retries, cooldown, delivery logs and live test delivery are release gates.",
+    text: "Encrypted channel storage, deduplicated incident outbox and a leased retry worker are implemented in source. Channels start unverified; an operator must verify ownership and configure alert rules. Cooldowns, latency alerts and live delivery tests remain release gates. Do not use production recipients yet.",
   },
   errors: {
     title: "Errors, limits and troubleshooting",

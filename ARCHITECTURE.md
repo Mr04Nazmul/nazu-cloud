@@ -20,7 +20,7 @@ Due monitors are leased transactionally using SKIP LOCKED. Four monitor checks r
 
 ## RPC security
 
-Exact operator allowlist, HTTPS-only, no URL credentials, public DNS answers only, resolved address pinned into TLS connection lookup, no redirects, bounded response bytes, explicit methods and deadlines. Provider API keys embedded in endpoint paths are not encrypted at rest yet: use nonsecret staging URLs until endpoint encryption is implemented. Production egress firewall is still required.
+Exact operator allowlist, HTTPS-only, no URL credentials, public DNS answers only, resolved address pinned into TLS connection lookup, no redirects, bounded response bytes, explicit methods and deadlines. Provider URLs are encrypted with AES-256-GCM using a server-only RPC_ENCRYPTION_KEY. Production egress firewall is still required.
 
 ## Wallet protocol
 
