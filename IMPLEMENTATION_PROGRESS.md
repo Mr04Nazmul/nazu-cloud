@@ -1,6 +1,6 @@
 # Implementation progress
 
-Updated 2026-10-27 JST. **Development implementation, not a completed production product.** Existing NAZU repositories and connected Supabase data remain unchanged.
+Updated 2026-10-27 JST. **Development implementation, not a completed production product.** Existing NAZU repositories and existing Supabase projects/data remain unchanged. A new isolated staging project was created and configured.
 
 ## Current verification
 
@@ -18,7 +18,7 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 | Phase              | Implemented                                                                                                                                 | Still required                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Discovery          | Repository/default-source review, branch inventory, connected schema summaries and existing security-advisor review                         | Exhaustive historical review and on-chain token deployment proof                                                   |
-| Foundation         | Strict pnpm monorepo, Next.js, private-schema migration and additive indexes, CI                                                            | Dedicated staging credentials, least-privilege DB roles, hosted advisor review                                     |
+| Foundation         | Strict pnpm monorepo, Next.js, private-schema migration and additive indexes, CI                                                            | Runtime staging credentials, least-privilege DB roles, real Auth tests                                     |
 | Website            | Public pages, docs, auth forms, labeled demo, responsive styles                                                                             | Mobile/accessibility QA, legal operator details                                                                    |
 | Developer platform | Organization/project creation; project update/delete; member CRUD/policies; API key lifecycle; quota/metering source; management dashboards | Live Supabase auth tests, email invitations, paid entitlements, pagination                                         |
 | Wallet auth        | SIWE, atomic nonce/session transaction, real signed-handler replay test, revocation, project limiter                                        | Live EIP-1271, relying-party cookie exchange, distributed abuse tests                                              |
@@ -27,14 +27,14 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 | SDK/docs           | Local typed SDKs, OpenAPI, examples and SDK tests                                                                                           | Release packaging, ownership verification, sandbox, broad contract coverage                                        |
 | Billing            | Proposed plans; free quotas enforced                                                                                                        | Provider/business eligibility, checkout, portal, signed/idempotent webhooks and paid entitlements: not implemented |
 | Admin              | Server ID allowlist + admin metadata + MFA policy; read-only DB counts/audits/heartbeat views                                               | MFA enrollment/verification UI and real auth tests; audited admin mutation workflows                               |
-| Operations         | Separate worker instructions, Dockerfiles, encrypted secrets configuration                                                                  | Hosting, dedicated staging, verified domain, retention jobs, backups/restore, external error tracking              |
+| Operations         | Separate worker instructions, Dockerfiles, encrypted secrets configuration                                                                  | Hosting, staging runtime configuration, verified domain, retention jobs, backups/restore, error tracking              |
 | Beta               | Business milestones documented                                                                                                              | No outreach, integrations, customers or revenue claimed                                                            |
 
-## Exact next configuration decision
+## Staging configuration
 
-The connected Supabase organization is **Nazu testnet** (`xwssbsavwunzmvxxvlwn`). Its existing shared project contains testnet and unrelated app data; it will not be repurposed. The other existing project is named for a different app and will not be repurposed silently. Select an organization for a new isolated NAZU Cloud staging project before project creation. Obtain a cost quote and explicit approval for any nonzero cost. No cost or purchase has been authorized.
+The user selected the connected **Nazu testnet** organization and approved a quoted $0/month project. On 2026-10-27 JST, a separate project **NAZU Cloud Staging** (`rmvmnxijigbbjnunwfwk`, Tokyo region) was created, status ACTIVE_HEALTHY. The two repository migrations were applied to this new empty staging database only; no existing testnet data was migrated. All 20 nazu_cloud tables have RLS enabled; anon and authenticated have no schema USAGE privileges. The Supabase security advisor reports 20 informational RLS-without-policy findings, consistent with the current browser-deny design. Privileged backend isolation and independent production review remain open.
 
-Then configure dedicated database/Auth, process hosting, server secret values, approved RPCs, actual worker region and controlled alert sender/recipients. Do not paste secrets into chat. No production migration may run without the user's approval.
+Still configure least-privilege database access and actual Supabase Auth, process hosting, server secret values, approved RPCs, actual worker region and controlled alert sender/recipients. No live website, API, worker or billing success is claimed. Never paste secrets into chat. No production migration or paid infrastructure may run without the user's approval.
 
 ## Known limitations
 
