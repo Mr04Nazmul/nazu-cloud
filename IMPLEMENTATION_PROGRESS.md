@@ -9,7 +9,7 @@ Updated 2026-10-27 JST. **Development implementation, not a completed production
 - Handler integration tests execute actual API handlers and SQL in PGlite. Supabase developer identity is mocked; wallet signatures use ephemeral local EOA keys and actual viem verification.
 - Verified flows: key create/hash → monitor create/encrypted URL → quota rejection → key revocation; stored key expiry and scope rejection; cross-organization project/member denial; exact-name delete guard; parallel SIWE replay allows one session; session lookup/logout/revocation.
 - Other tests cover tenant foreign keys, browser-role denial, stale status, cooldown lookup, obsolete downtime cancellation, member/owner protection, admin/MFA policy, bounded requests and SSRF controls.
-- Previous source CI run [40353768447](https://github.com/Mr04Nazmul/nazu-cloud/actions/runs/40353768447) passed at the 53-test milestone. Follow-up commits require their own CI verification.
+- Latest source CI run [40358342670](https://github.com/Mr04Nazmul/nazu-cloud/actions/runs/40358342670) passed all steps on commit 70ea92e54f5feebfc060fddde3e9d742d34c84df (66 tests). Backend-stage run 40358232688 also passed. Documentation-only contract/evidence updates do not change the tested source.
 - Prior production browser preview: homepage and outage toggle worked; signup was disabled without configuration; dashboard displayed setup state. Updated authenticated controls have not had configured browser E2E or mobile QA.
 - No live website, API, worker or billing success is claimed.
 
@@ -41,3 +41,5 @@ Then configure dedicated database/Auth, process hosting, server secret values, a
 RLS denies direct browser access; the backend still needs least-privilege tenant-context database hardening. Monitoring coverage estimates do not reconstruct pauses/jitter. Alert delivery is at-least-once and can duplicate after a crash. Updated UI controls are build-checked, not authenticated browser-tested. Unknown usage outcomes stay unknown; daily rollups and retention automation are pending. Global admin mutation controls and all paid billing remain disabled.
 
 No token operations, existing-data migration, npm publication, purchases or customer communications were performed.
+
+The retained user build contract is in docs/BUILD_CONTRACT.md, with launch gates in docs/LAUNCH_GATES.md.
