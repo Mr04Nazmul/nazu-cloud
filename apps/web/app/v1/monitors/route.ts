@@ -1,3 +1,4 @@
+import { withUsage } from "../../../lib/api";
 import { encryptEndpoint } from "../../../../../packages/shared/src/endpoint-secret";
 import { z } from "zod";
 import { db } from "../../../../../packages/database/src/index";
@@ -7,20 +8,20 @@ import {
 } from "../../../../../packages/shared/src/index";
 import { approvedEndpoint } from "../../../../../services/monitor-worker/src/rpc";
 import { access, body, errorResponse } from "../../../lib/api";
-export async function GET(req: Request) {
+async function getHandler(req: Request) {
   try {
     const projectId = z
       .uuid()
       .parse(new URL(req.url).searchParams.get("projectId"));
     await access(req, projectId);
     const data =
-      await db()`select id,project_id,name,chain_id,status,interval_seconds,last_checked_at,paused,created_at from nazu_cloud.rpc_monitors where project_id=${projectId} order by created_at desc limit 100`;
+      await db()`select id,project_id,name,chain_id,case when paused then 'paused' when last_checked_at is null or last_checked_at<now()-make_interval(secs=>interval_seconds*2) then 'unknown' else status end as status,interval_seconds,last_checked_at,paused,created_at from nazu_cloud.rpc_monitors where project_id=${projectId} order by created_at desc limit 100`;
     return Response.json({ data });
   } catch (e) {
     return errorResponse(e);
   }
 }
-export async function POST(req: Request) {
+async function postHandler(req: Request) {
   try {
     const input = monitorInput.parse(await body(req));
     const p = await access(req, input.projectId, true, "monitors:write");
@@ -46,4 +47,12 @@ export async function POST(req: Request) {
   } catch (e) {
     return errorResponse(e);
   }
+}
+
+export async function GET(req: Request) {
+  return withUsage(req, () => getHandler(req));
+}
+
+export async function POST(req: Request) {
+  return withUsage(req, () => postHandler(req));
 }

@@ -11,10 +11,10 @@ beforeAll(async () => {
   await db.exec(
     "create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);",
   );
-  const path =
-    "supabase/migrations/" +
-    readdirSync("supabase/migrations").find((x) => x.endsWith(".sql"));
-  await db.exec(readFileSync(path, "utf8"));
+  for (const name of readdirSync("supabase/migrations")
+    .filter((x) => x.endsWith(".sql"))
+    .sort())
+    await db.exec(readFileSync("supabase/migrations/" + name, "utf8"));
   await db.query(
     "insert into nazu_cloud.organizations(id,name) values ($1,'Org A'),($2,'Org B')",
     [orgA, orgB],
@@ -97,4 +97,33 @@ describe("migration and tenant constraints", () => {
       ).rows,
     ).toHaveLength(0);
   });
+});
+
+it("uses persisted delivery timestamps to honor per-monitor downtime cooldown", async () => {
+  const channel = "00000000-0000-4000-8000-000000000021";
+  await db.query(
+    "insert into nazu_cloud.alert_channels(id,organization_id,kind,destination_ciphertext,verified_at) values($1,$2,'discord','encrypted-fixture',now())",
+    [channel, orgA],
+  );
+  await db.query(
+    "insert into nazu_cloud.alert_rules(organization_id,monitor_id,channel_id,cooldown_seconds) values($1,$2,$3,900)",
+    [orgA, monitor, channel],
+  );
+  const incident = await db.query<{ id: string }>(
+    "select id from nazu_cloud.monitor_incidents where monitor_id=$1 order by opened_at limit 1",
+    [monitor],
+  );
+  await db.query(
+    "insert into nazu_cloud.alert_deliveries(organization_id,incident_id,channel_id,event,status,delivered_at) values($1,$2,$3,'down','sent',now()-interval '60 seconds')",
+    [orgA, incident.rows[0].id, channel],
+  );
+  const recent = await db.query<{
+    cooldown_seconds: number;
+    delivered_at: string;
+  }>(
+    "select max(other.delivered_at) as delivered_at,max(r.cooldown_seconds)::int as cooldown_seconds from nazu_cloud.alert_deliveries other join nazu_cloud.monitor_incidents i on i.id=other.incident_id join nazu_cloud.alert_rules r on r.channel_id=other.channel_id and r.monitor_id=i.monitor_id where other.channel_id=$1 and i.monitor_id=$2 and other.event='down' and other.status='sent' and other.delivered_at>now()-make_interval(secs=>r.cooldown_seconds)",
+    [channel, monitor],
+  );
+  expect(recent.rows[0].cooldown_seconds).toBe(900);
+  expect(recent.rows[0].delivered_at).not.toBeNull();
 });

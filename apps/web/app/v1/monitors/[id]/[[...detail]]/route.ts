@@ -1,3 +1,5 @@
+import { withUsage } from "../../../../../lib/api";
+import { observedStatus } from "../../../../../../../packages/shared/src/access-policy";
 import { z } from "zod";
 import { db } from "../../../../../../../packages/database/src/index";
 import {
@@ -18,7 +20,7 @@ async function monitor(req: Request, id: string, write = false) {
   );
   return m;
 }
-export async function GET(req: Request, ctx: Context) {
+async function getHandler(req: Request, ctx: Context) {
   try {
     const { id, detail } = await ctx.params;
     const m = await monitor(req, id);
@@ -59,12 +61,22 @@ export async function GET(req: Request, ctx: Context) {
       lease_until: _leaseUntil,
       ...safe
     } = m;
-    return Response.json({ data: safe });
+    return Response.json({
+      data: {
+        ...safe,
+        status: observedStatus({
+          status: m.status,
+          paused: m.paused,
+          last_checked_at: m.last_checked_at,
+          interval_seconds: m.interval_seconds,
+        }),
+      },
+    });
   } catch (e) {
     return errorResponse(e);
   }
 }
-export async function PATCH(req: Request, ctx: Context) {
+async function patchHandler(req: Request, ctx: Context) {
   try {
     const { id, detail } = await ctx.params;
     if (detail?.length)
@@ -77,7 +89,7 @@ export async function PATCH(req: Request, ctx: Context) {
     return errorResponse(e);
   }
 }
-export async function DELETE(req: Request, ctx: Context) {
+async function deleteHandler(req: Request, ctx: Context) {
   try {
     const { id, detail } = await ctx.params;
     if (detail?.length)
@@ -88,4 +100,16 @@ export async function DELETE(req: Request, ctx: Context) {
   } catch (e) {
     return errorResponse(e);
   }
+}
+
+export async function GET(req: Request, ctx: Context) {
+  return withUsage(req, () => getHandler(req, ctx));
+}
+
+export async function PATCH(req: Request, ctx: Context) {
+  return withUsage(req, () => patchHandler(req, ctx));
+}
+
+export async function DELETE(req: Request, ctx: Context) {
+  return withUsage(req, () => deleteHandler(req, ctx));
 }

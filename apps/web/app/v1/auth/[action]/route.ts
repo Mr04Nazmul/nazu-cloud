@@ -22,6 +22,12 @@ async function originProject(req: Request, projectId: string) {
     );
   return { p, origin };
 }
+async function walletLimit(projectId: string) {
+  const [bucket] =
+    await db()`insert into nazu_cloud.rate_limits(bucket,window_start,count) values (${projectId},date_trunc('minute',now()),1) on conflict(bucket,window_start) do update set count=nazu_cloud.rate_limits.count+1 returning count`;
+  if (bucket.count > 120)
+    throw new ApiError(429, "RATE_LIMITED", "Wallet project limit exceeded");
+}
 export async function OPTIONS(req: Request) {
   const origin = req.headers.get("origin");
   if (!origin) return new Response(null, { status: 403 });
@@ -59,6 +65,7 @@ export async function POST(req: Request, ctx: Context) {
       })
       .parse(await body(req));
     const { p, origin } = await originProject(req, input.projectId);
+    await walletLimit(p.id);
     const sql = db();
     const headers = {
       "Access-Control-Allow-Origin": origin,
@@ -190,6 +197,7 @@ export async function GET(req: Request, ctx: Context) {
       .uuid()
       .parse(new URL(req.url).searchParams.get("projectId"));
     const { p, origin } = await originProject(req, projectId);
+    await walletLimit(p.id);
     const token = req.headers.get("authorization")?.replace(/^Bearer /, "");
     if (!token)
       throw new ApiError(401, "UNAUTHENTICATED", "Session token required");

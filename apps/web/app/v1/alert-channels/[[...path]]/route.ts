@@ -83,3 +83,32 @@ export async function DELETE(req: Request, ctx: Context) {
     return errorResponse(e);
   }
 }
+
+export async function PATCH(req: Request, ctx: Context) {
+  try {
+    sameOrigin(req);
+    const path = (await ctx.params).path ?? [];
+    if (path.length !== 1)
+      throw new ApiError(404, "NOT_FOUND", "Unknown channel resource");
+    const input = z
+      .object({ organizationId: z.uuid(), destination: z.string().max(2000) })
+      .parse(await body(req));
+    const actor = await member(input.organizationId, "manage");
+    const data = await db().begin(async (tx) => {
+      const [c] =
+        await tx`select id,kind from nazu_cloud.alert_channels where id=${z.uuid().parse(path[0])} and organization_id=${input.organizationId} for update`;
+      if (!c) throw new ApiError(404, "NOT_FOUND", "Channel not found");
+      const encrypted = encryptDestination(
+        destination(c.kind, input.destination),
+      );
+      const [updated] =
+        await tx`update nazu_cloud.alert_channels set destination_ciphertext=${encrypted},verified_at=null where id=${c.id} returning id,kind,verified_at`;
+      await tx`update nazu_cloud.alert_deliveries set status='failed',locked_until=null,lease_owner=null where channel_id=${c.id} and status='pending'`;
+      await tx`insert into nazu_cloud.audit_logs(organization_id,actor_id,action) values (${input.organizationId},${actor},'alert_channel.destination_changed')`;
+      return updated;
+    });
+    return Response.json({ data });
+  } catch (e) {
+    return errorResponse(e);
+  }
+}

@@ -103,3 +103,11 @@ it("encrypts provider URL credentials at rest and rejects tampering", async () =
   expect(decryptEndpoint(sealed)).toBe(url);
   expect(() => decryptEndpoint("broken")).toThrow();
 });
+
+it("cancels delayed downtime after recovery without cancelling recovery notices", async () => {
+  const { obsoleteDowntime } =
+    await import("../../services/alert-worker/src/policy");
+  expect(obsoleteDowntime("down", new Date())).toBe(true);
+  expect(obsoleteDowntime("down", null)).toBe(false);
+  expect(obsoleteDowntime("recovery", new Date())).toBe(false);
+});

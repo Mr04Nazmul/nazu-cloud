@@ -67,23 +67,36 @@ export async function access(
     const [k] =
       await sql`select id,scopes from nazu_cloud.api_keys where project_id=${projectId} and secret_hash=${hashSecret(key)} and revoked_at is null and (expires_at is null or expires_at>now())`;
     if (!k) throw new ApiError(401, "INVALID_KEY", "Invalid API key");
-    if (!k.scopes.includes(scope))
+    const allowed = k.scopes.includes(scope);
+    const result = await sql.begin(async (tx) => {
+      await tx`select id from nazu_cloud.organizations where id=${p.organization_id} for update`;
+      const [usage] =
+        await tx`insert into nazu_cloud.rate_limits(bucket,window_start,count) values (${k.id},date_trunc('minute',now()),1) on conflict(bucket,window_start) do update set count=nazu_cloud.rate_limits.count+1 returning count`;
+      const [monthly] =
+        await tx`select count(*)::int as count from nazu_cloud.api_usage_events where organization_id=${p.organization_id} and created_at>=date_trunc('month',now())`;
+      const [event] =
+        await tx`insert into nazu_cloud.api_usage_events(organization_id,project_id,api_key_id,status_code) values (${p.organization_id},${p.id},${k.id},0) returning id`;
+      return {
+        id: String(event.id),
+        rateLimited: usage.count > 60,
+        quotaExceeded: monthly.count >= 10000,
+      };
+    });
+    usageContext.set(request, result.id);
+    if (result.rateLimited || result.quotaExceeded)
+      throw new ApiError(
+        429,
+        result.quotaExceeded ? "MONTHLY_QUOTA_EXCEEDED" : "RATE_LIMITED",
+        result.quotaExceeded
+          ? "Free monthly organization quota exceeded"
+          : "60 requests per minute exceeded",
+      );
+    if (!allowed)
       throw new ApiError(
         403,
         "SCOPE_DENIED",
         "API key scope does not permit this request",
       );
-    await sql.begin(async (tx) => {
-      const [usage] =
-        await tx`insert into nazu_cloud.rate_limits(bucket,window_start,count) values (${k.id},date_trunc('minute',now()),1) on conflict(bucket,window_start) do update set count=nazu_cloud.rate_limits.count+1 returning count`;
-      if (usage.count > 60)
-        throw new ApiError(
-          429,
-          "RATE_LIMITED",
-          "60 requests per minute exceeded",
-        );
-      await tx`insert into nazu_cloud.api_usage_events(organization_id,project_id,api_key_id,status_code) values (${p.organization_id},${p.id},${k.id},0)`;
-    });
   } else {
     if (write) sameOrigin(request);
     await member(p.organization_id, write ? "write" : "read");
@@ -97,4 +110,27 @@ export async function keyManager(request: Request, projectId: string) {
   if (!p) throw new ApiError(404, "NOT_FOUND", "Project not found");
   await member(p.organization_id, "manage");
   return p;
+}
+
+const usageContext = new WeakMap<Request, string>();
+export async function withUsage(
+  request: Request,
+  handler: () => Promise<Response>,
+): Promise<Response> {
+  let response: Response;
+  try {
+    response = await handler();
+  } catch (error) {
+    response = errorResponse(error);
+  }
+  const id = usageContext.get(request);
+  if (id) {
+    try {
+      await db()`update nazu_cloud.api_usage_events set status_code=${response.status} where id=${id}`;
+    } catch {
+      console.error("API response metering update failed");
+    }
+    usageContext.delete(request);
+  }
+  return response;
 }
