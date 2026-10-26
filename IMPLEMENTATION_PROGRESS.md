@@ -57,3 +57,7 @@ Render is connected in the confirmed workspace; existing services and data were 
 ## Hostless staging web preview
 
 The Hostless `nazu-cloud-staging` web app built commit `80d250b48b11d5614157aa06eb9c61d60970ba1a` and showed Running on 2026-10-27. The public homepage, its labeled demo outage toggle, documentation page, and `/v1/health` were checked in a browser. The health endpoint explicitly reports dependencies not checked. This is an unauthenticated development preview; no database, authentication, monitor worker, alert delivery, or production readiness is verified. The configuration review estimated $0.00; actual billing is provider-dependent. Existing Render data remains unmodified; its backup is outstanding. Staging URL: https://nazu-cloud-staging.hostless.app/.
+
+## Staging readiness follow-up
+
+On 2026-10-27, the dedicated Supabase staging project was rechecked as ACTIVE_HEALTHY and the deployed `/signup` page was verified to disable account creation while Supabase configuration is missing. Authentication redirects and least-privilege database runtime credentials are not configured; no end-to-end signup, monitoring, or alert is claimed. Render database `nazu-db` remains available and expires 2026-11-05; a complete private export and restore test remain outstanding. The connected Render API provides read-only SQL but no database export or connection credentials; do not copy password hashes into the public repository.
