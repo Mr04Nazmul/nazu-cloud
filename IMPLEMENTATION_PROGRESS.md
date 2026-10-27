@@ -85,3 +85,7 @@ The monitor worker now advances the next scheduled check and releases its lease 
 ## Monitor cycle integration test
 
 Extracted the real worker cycle so it can be exercised against PGlite with deterministic injected RPC responses. The integration test verifies that checks are stored, no incident opens during the first two failures, one incident opens on the third and remains deduplicated after the fourth, and a healthy check resolves the incident and creates distinct down/recovery delivery jobs. Formatting, lint, typecheck, all 76 tests and production build passed locally. No actual RPC, external delivery, deployed worker, or GitHub CI success has been verified by this test. Changes are on the staging-bounded-jobs branch, not deployed. Render backup work was deferred at the user's instruction.
+
+## Alert worker integration tests
+
+The real alert processing cycle was extracted for database integration tests with a mocked provider. Tests confirm a failed send is rescheduled, a later successful send records delivery and attempt count, and the fifth failure marks the delivery failed. On 2026-10-27 formatting, lint, typecheck, 78 tests and web production build passed locally. No real email or Discord notification was sent; live provider configuration, worker deployment, end-to-end alert testing and GitHub CI verification remain outstanding. The work is on the staging-bounded-jobs branch only.
