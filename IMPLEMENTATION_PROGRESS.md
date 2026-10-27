@@ -81,3 +81,7 @@ On 2026-10-27, the monitor checker was hardened to reject noncanonical EIP-1474 
 ## Duplicate monitor check recovery
 
 The monitor worker now advances the next scheduled check and releases its lease when an already-saved scheduled slot is encountered, without duplicating incident transitions or overwriting existing status. A PGlite integration test exercises the recovery update and preserves the existing failure state. Formatting, lint, typecheck, 75 local tests, and production build passed on 2026-10-27. The worker is not deployed, no live endpoint or alerts have been tested, and GitHub CI results remain unverified. Existing Render data remains untouched and its backup is still outstanding.
+
+## Monitor cycle integration test
+
+Extracted the real worker cycle so it can be exercised against PGlite with deterministic injected RPC responses. The integration test verifies that checks are stored, no incident opens during the first two failures, one incident opens on the third and remains deduplicated after the fourth, and a healthy check resolves the incident and creates distinct down/recovery delivery jobs. Formatting, lint, typecheck, all 76 tests and production build passed locally. No actual RPC, external delivery, deployed worker, or GitHub CI success has been verified by this test. Changes are on the staging-bounded-jobs branch, not deployed. Render backup work was deferred at the user's instruction.
