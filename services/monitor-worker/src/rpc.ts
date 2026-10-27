@@ -40,6 +40,12 @@ export async function resolveEndpoint(value: string, allowedHosts: string[]) {
   return { url, address: answers[0].address, family: answers[0].family };
 }
 export type PinnedEndpoint = Awaited<ReturnType<typeof resolveEndpoint>>;
+/** EIP-1474 quantities use a 0x prefix and the shortest possible hex encoding. */
+export function isRpcQuantity(value: unknown): value is string {
+  return (
+    typeof value === "string" && /^0x(?:0|[1-9a-fA-F][0-9a-fA-F]*)$/.test(value)
+  );
+}
 export function rpcRequest(
   target: PinnedEndpoint,
   method: "eth_chainId" | "eth_blockNumber",
@@ -82,8 +88,7 @@ export function rpcRequest(
               body.jsonrpc !== "2.0" ||
               body.id !== id ||
               body.error ||
-              typeof body.result !== "string" ||
-              !/^0x[0-9a-f]+$/i.test(body.result)
+              !isRpcQuantity(body.result)
             )
               throw new Error("Invalid JSON-RPC result");
             resolve(body.result);
@@ -119,14 +124,15 @@ export async function checkRpc(
   try {
     const target = await resolver(endpoint, allowedHosts);
     const chain = await request(target, "eth_chainId", 1);
-    if (BigInt(chain as string) !== BigInt(chainId))
+    if (!isRpcQuantity(chain) || BigInt(chain) !== BigInt(chainId))
       throw new Error("Chain mismatch");
     const block = await request(target, "eth_blockNumber", 2);
+    if (!isRpcQuantity(block)) throw new Error("Invalid block quantity");
     const latency = Math.round(performance.now() - start);
     return {
       status: latency > threshold ? "degraded" : "healthy",
       latency_ms: latency,
-      block_number: BigInt(block as string).toString(),
+      block_number: BigInt(block).toString(),
       error_code: null,
     };
   } catch {
