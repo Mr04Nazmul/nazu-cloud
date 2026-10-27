@@ -135,6 +135,28 @@ describe("RPC correctness", () => {
         resolver,
       ),
     ).toMatchObject({ status: "down", error_code: "RPC_CHECK_FAILED" }));
+  it.each([
+    ["0x01", "0x1"],
+    ["0x1", "0x00"],
+    ["0x1", "0x"],
+    ["0x1", "0X10"],
+  ])(
+    "rejects noncanonical chain or block quantities %s %s",
+    async (chain, block) => {
+      const result = await checkRpc(
+        "https://rpc.example",
+        1,
+        2000,
+        ["rpc.example"],
+        async (_target, method) => (method === "eth_chainId" ? chain : block),
+        resolver,
+      );
+      expect(result).toMatchObject({
+        status: "down",
+        error_code: "RPC_CHECK_FAILED",
+      });
+    },
+  );
   it("redacts provider failures", async () => {
     const r = await checkRpc(
       "https://rpc.example/private-key",
