@@ -77,3 +77,7 @@ Read-only inspection on 2026-10-27 confirmed all 20 `nazu_cloud` tables have RLS
 ## EVM response validation
 
 On 2026-10-27, the monitor checker was hardened to reject noncanonical EIP-1474 quantities (including leading zeros and missing digits) for both chain ID and block number. Local verification: 74 tests, formatting, ESLint, typecheck, and Next.js production build passed. This is committed to the staging-bounded-jobs branch; it has not been deployed and has not been tested against a live RPC provider. CI for this branch is pending verification. The account setup, workers, live alert tests and Render backup remain incomplete.
+
+## Duplicate monitor check recovery
+
+The monitor worker now advances the next scheduled check and releases its lease when an already-saved scheduled slot is encountered, without duplicating incident transitions or overwriting existing status. A PGlite integration test exercises the recovery update and preserves the existing failure state. Formatting, lint, typecheck, 75 local tests, and production build passed on 2026-10-27. The worker is not deployed, no live endpoint or alerts have been tested, and GitHub CI results remain unverified. Existing Render data remains untouched and its backup is still outstanding.
