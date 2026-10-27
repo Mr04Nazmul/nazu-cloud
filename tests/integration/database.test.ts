@@ -1,6 +1,8 @@
 import { PGlite } from "@electric-sql/pglite";
 import { readFileSync, readdirSync } from "node:fs";
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
+import type { TransactionSql } from "postgres";
+import { advanceDuplicateSlot } from "../../services/monitor-worker/src/duplicate";
 let db: PGlite;
 const orgA = "00000000-0000-4000-8000-000000000001",
   orgB = "00000000-0000-4000-8000-000000000002",
@@ -62,6 +64,37 @@ describe("migration and tenant constraints", () => {
       b = await db.query(q, [orgA, monitor]);
     expect(a.rows).toHaveLength(1);
     expect(b.rows).toHaveLength(0);
+  });
+  it("advances a duplicate scheduled check without changing its existing result", async () => {
+    await db.query(
+      "update nazu_cloud.rpc_monitors set status='down',consecutive_failures=3,next_check_at=now()-interval '1 minute',lease_owner=$1,lease_until=now()+interval '1 minute' where id=$2",
+      [orgA, monitor],
+    );
+    const tag = async (strings: TemplateStringsArray, ...values: unknown[]) => {
+      const query = strings.reduce(
+        (sql, part, i) => sql + (i ? "$" + i : "") + part,
+        "",
+      );
+      return (await db.query(query, values)).rows;
+    };
+    await advanceDuplicateSlot(tag as unknown as TransactionSql, monitor);
+    const result = await db.query<{
+      status: string;
+      consecutive_failures: number;
+      lease_owner: string | null;
+      lease_until: string | null;
+      scheduled_in_future: boolean;
+    }>(
+      "select status,consecutive_failures,lease_owner,lease_until,next_check_at>now() as scheduled_in_future from nazu_cloud.rpc_monitors where id=$1",
+      [monitor],
+    );
+    expect(result.rows[0]).toMatchObject({
+      status: "down",
+      consecutive_failures: 3,
+      lease_owner: null,
+      lease_until: null,
+      scheduled_in_future: true,
+    });
   });
   it("deduplicates open incidents and permits a new one after recovery", async () => {
     const q =
