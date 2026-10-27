@@ -73,3 +73,7 @@ Reviewed the deployed auth form and callback and current Supabase documentation.
 ## Staging database security inspection
 
 Read-only inspection on 2026-10-27 confirmed all 20 `nazu_cloud` tables have RLS enabled, are owned by postgres, and have zero policies; none uses FORCE RLS. Browser roles have no schema access. This is a deny-by-default browser configuration, not tenant isolation for the privileged backend. A new non-owner login without matching policies would be denied; using the owner instead would bypass these protections. Do not connect real user workloads until separate runtime roles, tenant-aware policies, worker access, and cross-tenant integration tests have been implemented and reviewed. SMTP for public signup is also unconfigured. No database objects or credentials were changed.
+
+## EVM response validation
+
+On 2026-10-27, the monitor checker was hardened to reject noncanonical EIP-1474 quantities (including leading zeros and missing digits) for both chain ID and block number. Local verification: 74 tests, formatting, ESLint, typecheck, and Next.js production build passed. This is committed to the staging-bounded-jobs branch; it has not been deployed and has not been tested against a live RPC provider. CI for this branch is pending verification. The account setup, workers, live alert tests and Render backup remain incomplete.
