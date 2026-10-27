@@ -2,6 +2,7 @@ import { decryptEndpoint } from "../../../packages/shared/src/endpoint-secret";
 import { randomUUID } from "node:crypto";
 import { db } from "../../../packages/database/src/index";
 import { checkRpc } from "./rpc";
+import { advanceDuplicateSlot } from "./duplicate";
 const sql = db();
 const worker = randomUUID();
 let stopping = false;
@@ -34,7 +35,10 @@ async function runOne() {
     if (!m) return;
     const [saved] =
       await tx`insert into nazu_cloud.monitor_checks (organization_id,monitor_id,scheduled_at,status,latency_ms,block_number,error_code) values (${m.organization_id},${m.id},${m.next_check_at},${result.status},${result.latency_ms},${result.block_number},${result.error_code}) on conflict (monitor_id,scheduled_at) do nothing returning id`;
-    if (!saved) return;
+    if (!saved) {
+      await advanceDuplicateSlot(tx, m.id);
+      return;
+    }
     const failures = result.status === "down" ? m.consecutive_failures + 1 : 0;
     await tx`update nazu_cloud.rpc_monitors set status=${result.status},consecutive_failures=${failures},last_checked_at=now(),next_check_at=now()+make_interval(secs=>interval_seconds)+(random()*interval '15 seconds'),lease_until=null,lease_owner=null where id=${m.id}`;
     if (failures >= 3) {
